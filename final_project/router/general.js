@@ -1,4 +1,5 @@
 const express = require('express');
+const axios = require('axios').default;
 let books = require("./booksdb.js");
 let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
@@ -21,32 +22,59 @@ public_users.post("/register", (req,res) => {
 });
 
 // Get the book list available in the shop
-public_users.get('/',function (req, res) {
-  //Write your code here
-    res.send(JSON.stringify(books, null, 4));
+public_users.get('/',async (req, res) => {
+    //Write your code here
+    try {
+        const booksOut = await Promise.resolve(books);
+        console.log("Promise fulfilled");
+        res.send(JSON.stringify(booksOut, null, 4));
+    } catch (error) {
+        console.log("Promise rejected");
+        res.status(500).json({message: "Error fetching books."});
+    }
 });
 
 // Get book details based on ISBN
-public_users.get('/isbn/:isbn',function (req, res) {
-  isbn = req.params.isbn;
-
-  res.send(books[isbn]);
+public_users.get('/isbn/:isbn',async (req, res) => {
+    try {
+        isbn = req.params.isbn;
+        const booksOut = await Promise.resolve(books);
+        console.log("Promise fulfilled");
+        res.send(booksOut[isbn]);
+    } catch (error) {
+        console.log("Promise rejected");
+        res.status(300).json({message: `Error fetching book with ISBN ${isbn}`});
+    }
  });
   
 // Get book details based on author
-public_users.get('/author/:author',function (req, res) {
+public_users.get('/author/:author',async (req, res) => {
   //Write your code here
-  author = req.params.author;
-  let filtered_books = Object.entries(books).filter(([,book]) => book.author === author);
-  res.send(filtered_books);
+    try {
+        author = req.params.author;
+        const booksOut = await Promise.resolve(books);
+        let filtered_books = Object.entries(booksOut).filter(([,book]) => book.author === author);
+        console.log("Promise fulfilled");
+        res.send(filtered_books);
+    } catch (error) {
+        console.log("Promise rejected");
+        res.status(300).json({message: `Error fetching books from author ${author}`});
+}
 });
 
 // Get all books based on title
-public_users.get('/title/:title',function (req, res) {
+public_users.get('/title/:title',async (req, res) => {
   //Write your code here
-  title = req.params.title;
-  let filtered_books = Object.entries(books).filter(([,book]) => book.title === title);
-  res.send(filtered_books);
+    try {
+        title = req.params.title;
+        const booksOut = await Promise.resolve(books);
+        let filtered_books = Object.entries(booksOut).filter(([,book]) => book.title === title);
+        console.log("Promise fulfilled");
+        res.send(filtered_books);
+    } catch (error) {
+        console.log("Promise rejected");
+        res.status(300).json({message: `Error fetching books with title ${title}`});
+    }
 });
 
 //  Get book review
